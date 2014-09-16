@@ -1,0 +1,22 @@
+1. Data Prepartion Code : 
+
+## To find the list of the events with various log scope for given customer
+select to_char(TO_TIMESTAMP(EVENT_TIME,'YYYY-MM-DD HH24:MI:SS.FF'),'yyyymmdd')||'~'||to_char(TO_TIMESTAMP(EVENT_TIME,'YYYY-MM-DD HH24:MI:SS.FF'),'hh') , 
+account_id,log_scope,name, count(distinct  event_uuid)
+from event_logger , eventdefination_tech
+where 
+event_logger.event_definition_id = eventdefination_tech.event_definition_id
+and Account_id = '1-DR4E2'
+group by to_char(TO_TIMESTAMP(EVENT_TIME,'YYYY-MM-DD HH24:MI:SS.FF'),'yyyymmdd')||'~'||to_char(TO_TIMESTAMP(EVENT_TIME,'YYYY-MM-DD HH24:MI:SS.FF'),'hh') , 
+account_id,log_scope,name
+;
+
+2. R Code
+
+> eLog<-read.table ("c:/data/EventLogScope.csv", header=TRUE, sep=",");
+> head(eLog)
+> boxplot(eLog$Occurrence ~ eLog$log_Scope)
+> eLog2<-read.table ("c:/data/EventLogScope_Mosaic.csv", header=TRUE, sep=",");
+> mosaicplot( eLog2$Occurrence ~ eLog$Event_Name)
+
+
