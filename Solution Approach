@@ -40,7 +40,7 @@ Explanatory(EEvent) and Responsive Event(REvent)
 
 Approach :  
  - Need to cleanse data and clustering of related source sytem events (Requires Subject Matter Expert , Not in Scope)
- - For given day , Calculate the no. of occurence of EEvent with respective to REvent and loaded the data into table ' '
+ - For given day , Calculate the no. of occurence of EEvent with respective to REvent and loaded the data into table 'events_correlation_coeff'
 
 Tool Used: SQL Developer 
 Code     : Plsql , refer the document <>
