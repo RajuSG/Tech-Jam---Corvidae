@@ -1,0 +1,72 @@
+Step 1 : Loading Data into Oracle Database Using SQL Loader
+
+Commands
+
+##Event Definition 
+
+##Event Logger
+
+##Event System and Subsystem
+
+sqlldr userid=erm/********@QEDW1.akamai.com control=event_logger_1.ctl log=event_logger_1.log
+
+
+Step 2 : Oberservational Data Analysis
+
+
+
+
+
+
+Step 3 : Statistical Analysis Part 1 : Finding Co-relation between events 
+
+Found co-relation coefficient between events for every event with respective to other 279 events.Consider two variables say 
+Explanatory(EEvent) and Responsive Event(REvent)
+
+Approach :  
+ - Need to cleanse data and clustering of related source sytem events (Requires Subject Matter Expert , Not in Scope)
+ - For given day , Calculate the no. of occurence of EEvent with respective to REvent and loaded the data into table ' '
+
+Tool Used: SQL Developer 
+Code     : Plsql , refer the document <>
+
+Verification : Using Online Corelaton Coefficient Calculotor 
+Link         : http://www.socscistatistics.com/tests/pearson/Default2.aspx
+
+
+Visualization : Using Martix chart represent co-relation coefficient(r) between events
+
+
+Tool Used : R Studio
+Code      :
+
+
+PN : Data 
+
+
+Step 4 : Statistical Analysis  Part 2 : Finding the Average time for the occurence of 
+
+Approach : 
+  - Find the list of events having positive co-relation coefficient from Step 3
+  - Find the distance (Time difference between the Responsive Event and Explanatory Event)
+  - Bucket the distance into appropriate bucket intervals
+  - Plot the Bucket Versus 
+
+Tool Used: SQL Developer 
+Code     : Plsql , refer the document <>
+
+
+Visualization : Using  represent co-relation coefficient(r) between events
+
+Tool Used : Excel
+Code      :
+
+
+
+
+Step 4 : 
+
+
+Step 5 : 
+
+
