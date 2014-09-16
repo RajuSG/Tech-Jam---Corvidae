@@ -1,0 +1,9 @@
+##Query for Bubble Chart
+
+select to_char(TO_TIMESTAMP(EVENT_TIME,'YYYY-MM-DD HH24:MI:SS.FF'),'YYYYMMDD') TIME ,name,count(distinct  event_uuid)
+as "No of events" from event_logger , eventdefination_tech
+where 
+event_logger.event_definition_id = eventdefination_tech.event_definition_id
+and ACCOUNT_ID in('1-DR4E2')
+group by to_char(TO_TIMESTAMP(EVENT_TIME,'YYYY-MM-DD HH24:MI:SS.FF'),'YYYYMMDD')   ,
+account_id,name order by time;
