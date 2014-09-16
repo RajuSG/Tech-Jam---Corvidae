@@ -19,7 +19,7 @@ Step 2 : Oberservational Data Analysis
 
 
 Step 3 : Statistical Analysis Part 1 : Finding Co-relation between events 
-
+ 
 Found co-relation coefficient between events for every event with respective to other 279 events.Consider two variables say 
 Explanatory(EEvent) and Responsive Event(REvent)
 
@@ -34,23 +34,29 @@ Verification : Using Online Corelaton Coefficient Calculotor
 Link         : http://www.socscistatistics.com/tests/pearson/Default2.aspx
 
 
-Visualization : Using Martix chart represent co-relation coefficient(r) between events
+Visualization 1 : Using Martix chart represent co-relation coefficient(r) between events
 
 
 Tool Used : R Studio
 Code      :
 
 
-PN : Data 
+Visualization 2 : Using Martix chart represent co-relation coefficient(r) between events
+
+Tool Used : Online Circos
+Code      : Attached visualization
+
+PN : Data will be restricted certain events for given small set of related systems and subsystems
 
 
-Step 4 : Statistical Analysis  Part 2 : Finding the Average time for the occurence of 
+Step 4 : Statistical Analysis  Part 2 : Finding the Average time distance for the occurence of Responsive Event 
+for given Explanatory Event
 
 Approach : 
   - Find the list of events having positive co-relation coefficient from Step 3
   - Find the distance (Time difference between the Responsive Event and Explanatory Event)
   - Bucket the distance into appropriate bucket intervals
-  - Plot the Bucket Versus 
+  - Plot the Bucket Versus Time distance
 
 Tool Used: SQL Developer 
 Code     : Plsql , refer the document <>
@@ -59,14 +65,18 @@ Code     : Plsql , refer the document <>
 Visualization : Using  represent co-relation coefficient(r) between events
 
 Tool Used : Excel
-Code      :
+Code      : Refer the attached excel document < > 
+
+
+Extensibility : 
 
 
 
 
-Step 4 : 
 
 
-Step 5 : 
+Conclusion : 
+
+
 
 
