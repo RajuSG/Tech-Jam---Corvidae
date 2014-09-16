@@ -1,0 +1,189 @@
+create table dummy_seq  as 
+select ROWNUM  as dummy_col 
+from ALL_OBJECTS 
+where ROWNUM <= 10000 ;
+select * from dummy_seq;
+
+## Table Creation Script
+
+create table events_correlation_coeff (EVENT_ID1 varchar2(100),EVENT1 varchar2(1000),EVENT_ID2 varchar2(100),EVENT2 varchar2(1000),corr_coeff number(7,4),total_samples number);
+set serveroutput on;
+
+create or replace procedure p_event_corr_coeff (IN_Event1 in varchar2, IN_Event2 in varchar2) as
+    vPopulation     NUMBER;
+    vSumX           NUMBER;
+    vSumY           NUMBER;
+    vMeanX          NUMBER;
+    vMeanY          NUMBER;
+    vDistMeanX      NUMBER;
+    vDistMeanY      NUMBER;
+    vProdXY         NUMBER;    
+    vSumProdXY      NUMBER:=0;
+    aSqr            NUMBER;
+    aSumSqrX        NUMBER:=0;
+    aSumSqrY        NUMBER:=0;   
+    vCurValX        NUMBER;
+    vCurValY        NUMBER;
+    vCorrel         NUMBER;
+    EVENT1 varchar2(1000);
+    EVENT2 varchar2(1000);
+    EVENT_NAME1 varchar2(1000);
+    EVENT_NAME2 varchar2(1000);
+  -- Call this guy our X     
+  CURSOR aCurX (EVENT1 varchar2, EVENT2 varchar2) is select cnt from (select cnt from (
+select a.event_definition_id,b.name, to_char(TO_TIMESTAMP(EVENT_TIME,'YYYY-MM-DD HH24:MI:SS.FF'),'YYYYMMDDHH24') as event_time_hour ,count(*) as cnt
+from event_logger A ,eventdefination_tech B  where a.event_definition_id=b.event_definition_id and b.active='1' 
+group by a.event_definition_id,b.name,to_char(TO_TIMESTAMP(EVENT_TIME,'YYYY-MM-DD HH24:MI:SS.FF'),'YYYYMMDDHH24')) where event_definition_id=EVENT1
+union all
+(select 0 as cnt from dummy_seq where dummy_col<=((select count(cnt) from (
+	select a.event_definition_id,b.name, to_char(TO_TIMESTAMP(EVENT_TIME,'YYYY-MM-DD HH24:MI:SS.FF'),'YYYYMMDDHH24') as event_time_hour ,count(*) as cnt
+	from event_logger A ,eventdefination_tech B  where a.event_definition_id=b.event_definition_id and b.active='1' 
+	group by a.event_definition_id,b.name,to_char(TO_TIMESTAMP(EVENT_TIME,'YYYY-MM-DD HH24:MI:SS.FF'),'YYYYMMDDHH24')) where event_definition_id=EVENT2)- ( select count(cnt)  from (
+	select a.event_definition_id,b.name, to_char(TO_TIMESTAMP(EVENT_TIME,'YYYY-MM-DD HH24:MI:SS.FF'),'YYYYMMDDHH24') as event_time_hour ,count(*) as cnt
+	from event_logger A ,eventdefination_tech B  where a.event_definition_id=b.event_definition_id and b.active='1' 
+	group by a.event_definition_id,b.name,to_char(TO_TIMESTAMP(EVENT_TIME,'YYYY-MM-DD HH24:MI:SS.FF'),'YYYYMMDDHH24')) where event_definition_id=EVENT1) )));
+ 
+  -- Call this guy our Y   
+  CURSOR aCurY (EVENT2 varchar2, EVENT1 varchar2) is select cnt from (select cnt from (
+select a.event_definition_id,b.name, to_char(TO_TIMESTAMP(EVENT_TIME,'YYYY-MM-DD HH24:MI:SS.FF'),'YYYYMMDDHH24') as event_time_hour ,count(*) as cnt
+from event_logger A ,eventdefination_tech B  where a.event_definition_id=b.event_definition_id and b.active='1' 
+group by a.event_definition_id,b.name,to_char(TO_TIMESTAMP(EVENT_TIME,'YYYY-MM-DD HH24:MI:SS.FF'),'YYYYMMDDHH24')) where event_definition_id=EVENT2
+union all
+(select 0 as cnt from dummy_seq where dummy_col<=((select count(cnt) from (
+	select a.event_definition_id,b.name, to_char(TO_TIMESTAMP(EVENT_TIME,'YYYY-MM-DD HH24:MI:SS.FF'),'YYYYMMDDHH24') as event_time_hour ,count(*) as cnt
+	from event_logger A ,eventdefination_tech B  where a.event_definition_id=b.event_definition_id and b.active='1' 
+	group by a.event_definition_id,b.name,to_char(TO_TIMESTAMP(EVENT_TIME,'YYYY-MM-DD HH24:MI:SS.FF'),'YYYYMMDDHH24')) where event_definition_id=EVENT1)- ( select count(cnt)  from (
+	select a.event_definition_id,b.name, to_char(TO_TIMESTAMP(EVENT_TIME,'YYYY-MM-DD HH24:MI:SS.FF'),'YYYYMMDDHH24') as event_time_hour ,count(*) as cnt
+	from event_logger A ,eventdefination_tech B  where a.event_definition_id=b.event_definition_id and b.active='1' 
+	group by a.event_definition_id,b.name,to_char(TO_TIMESTAMP(EVENT_TIME,'YYYY-MM-DD HH24:MI:SS.FF'),'YYYYMMDDHH24')) where event_definition_id=EVENT2) )));                 
+                      
+BEGIN
+EVENT1:=IN_Event1;
+EVENT2:=IN_Event2;
+    -- Get the population (N).
+    select count(cnt) into vPopulation from (select cnt from (
+select a.event_definition_id,b.name, to_char(TO_TIMESTAMP(EVENT_TIME,'YYYY-MM-DD HH24:MI:SS.FF'),'YYYYMMDDHH24') as event_time_hour ,count(*) as cnt
+from event_logger A ,eventdefination_tech B  where a.event_definition_id=b.event_definition_id and b.active='1' 
+group by a.event_definition_id,b.name,to_char(TO_TIMESTAMP(EVENT_TIME,'YYYY-MM-DD HH24:MI:SS.FF'),'YYYYMMDDHH24')) where event_definition_id=EVENT1
+union all
+(select 0 as cnt from dummy_seq where dummy_col<=((select count(cnt) from (
+	select a.event_definition_id,b.name, to_char(TO_TIMESTAMP(EVENT_TIME,'YYYY-MM-DD HH24:MI:SS.FF'),'YYYYMMDDHH24') as event_time_hour ,count(*) as cnt
+	from event_logger A ,eventdefination_tech B  where a.event_definition_id=b.event_definition_id and b.active='1' 
+	group by a.event_definition_id,b.name,to_char(TO_TIMESTAMP(EVENT_TIME,'YYYY-MM-DD HH24:MI:SS.FF'),'YYYYMMDDHH24')) where event_definition_id=EVENT2)- ( select count(cnt)  from (
+	select a.event_definition_id,b.name, to_char(TO_TIMESTAMP(EVENT_TIME,'YYYY-MM-DD HH24:MI:SS.FF'),'YYYYMMDDHH24') as event_time_hour ,count(*) as cnt
+	from event_logger A ,eventdefination_tech B  where a.event_definition_id=b.event_definition_id and b.active='1' 
+	group by a.event_definition_id,b.name,to_char(TO_TIMESTAMP(EVENT_TIME,'YYYY-MM-DD HH24:MI:SS.FF'),'YYYYMMDDHH24')) where event_definition_id=EVENT1) )));
+
+    DBMS_OUTPUT.PUT_LINE('Population = ' || vPopulation);  
+    
+    
+  --- Next get the Event names for X and Y
+  
+  select distinct name into EVENT_NAME1 from eventdefination_tech where event_definition_id=EVENT1;
+select distinct name into EVENT_NAME2 from eventdefination_tech where event_definition_id=EVENT2;
+          
+    -- Next get the sum of X
+    select sum(cnt) INTO  vSumX from (
+	select a.event_definition_id,b.name, to_char(TO_TIMESTAMP(EVENT_TIME,'YYYY-MM-DD HH24:MI:SS.FF'),'YYYYMMDDHH24') as event_time_hour ,count(*) as cnt
+	from event_logger A ,eventdefination_tech B  where a.event_definition_id=b.event_definition_id and b.active='1' 
+	group by a.event_definition_id,b.name,to_char(TO_TIMESTAMP(EVENT_TIME,'YYYY-MM-DD HH24:MI:SS.FF'),'YYYYMMDDHH24')) where event_definition_id=EVENT1;
+    DBMS_OUTPUT.PUT_LINE('Sum SamplesX= ' || vSumX);
+    
+     -- Next get the sum of Y
+    select sum(cnt) INTO  vSumY from (
+	select a.event_definition_id,b.name, to_char(TO_TIMESTAMP(EVENT_TIME,'YYYY-MM-DD HH24:MI:SS.FF'),'YYYYMMDDHH24') as event_time_hour ,count(*) as cnt
+	from event_logger A ,eventdefination_tech B  where a.event_definition_id=b.event_definition_id and b.active='1' 
+	group by a.event_definition_id,b.name,to_char(TO_TIMESTAMP(EVENT_TIME,'YYYY-MM-DD HH24:MI:SS.FF'),'YYYYMMDDHH24')) where event_definition_id=EVENT2;
+    DBMS_OUTPUT.PUT_LINE('Sum SamplesY= ' || vSumY);  
+    
+    -- The mean is the sum of the samples divided by the population
+    vMeanX := vSumX/vPopulation;
+    vMeanY := vSumY/vPopulation;
+    DBMS_OUTPUT.PUT_LINE('Mean X= ' || vMeanX);
+    DBMS_OUTPUT.PUT_LINE('Mean Y= ' || vMeanY);
+    
+    -- Obtain each sample for X and determine its distance from the mean. Square it, then sum it. 
+    -- Finally divide it by the population. This is our VARIANCE for X
+    OPEN aCurX(EVENT1,EVENT2);
+    LOOP
+        FETCH aCurX INTO vCurValX;
+        EXIT WHEN aCurX%NOTFOUND;        
+        aSqr := (vCurValX - vMeanX) * (vCurValX - vMeanX);
+        aSumSqrX := aSqr + aSumSqrX;    
+    END LOOP;
+    CLOSE aCurX;
+    DBMS_OUTPUT.PUT_LINE('Variance X= ' || aSumSqrX);
+    
+    -- Obtain each sample for Y and determine its distance from the mean. Square it, then sum it. 
+    -- Finally divide it by the population. This is our VARIANCE for Y
+    OPEN aCurY(EVENT2,EVENT1);
+    LOOP
+        FETCH aCurY INTO vCurValY;
+        EXIT WHEN aCurY%NOTFOUND;        
+        aSqr := (vCurValY - vMeanY) * (vCurValY - vMeanY);
+        aSumSqrY := aSqr + aSumSqrY;    
+    END LOOP;
+    CLOSE aCurY;
+    DBMS_OUTPUT.PUT_LINE('Variance Y= ' || aSumSqrY);
+    
+    -- Determine the covarience of X and Y. Subtract the respective mean from each value and
+    -- get their product. Sum this product until out of values.
+    OPEN aCurX(EVENT1,EVENT2);
+    OPEN aCurY(EVENT2,EVENT1);
+    
+    -- Loop through the population
+    FOR i IN 1..vPopulation
+    LOOP
+        FETCH aCurX INTO vCurValX;
+        FETCH aCurY INTO vCurValY;        
+        vDistMeanX := vCurValX - vMeanX;
+        vDistMeanY := vCurValY - vMeanY;
+        vProdXY := vDistMeanX * vDistMeanY;  
+        vSumProdXY := vSumProdXY + vProdXY;     
+    END LOOP;
+    
+    -- Now get the correlation coeficient
+    begin
+    vCorrel := vSumProdXY/SQRT(aSumSqrX * aSumSqrY);
+    exception
+    WHEN ZERO_DIVIDE
+    then
+    vCorrel := 0;
+    DBMS_OUTPUT.PUT_LINE('Correl Coef= ' || vCorrel);
+    end;
+    insert into events_correlation_coeff  values(EVENT1,EVENT_NAME1,EVENT2,EVENT_NAME2,vCorrel,vPopulation);
+   commit;
+END;   
+/
+
+create or replace procedure p_event_correlation_init as
+cursor curr_events is
+select Event1,event2 from
+(select distinct event_definition_id  event1,name event_name1 from EVENTDEFINATION_TECH where event_definition_id in (select distinct event_definition_id from event_logger)
+) A ,
+(select distinct event_definition_id  event2,name event_name2 from EVENTDEFINATION_TECH where event_definition_id in (select distinct event_definition_id from event_logger)
+) B
+where A.event1!=b.event2 and a.event1>b.event2;
+
+v_curr_events curr_events%rowtype;
+
+begin
+open curr_events;
+loop
+fetch curr_events into v_curr_events;
+exit when curr_events%NOTFOUND;
+P_EVENT_CORR_COEFF(v_curr_events.Event1,v_curr_events.Event2);
+end loop;
+close curr_events;
+end ;
+/
+
+truncate table events_correlation_coeff;
+select * from events_correlation_coeff;
+
+
+set serveroutput on;
+execute P_EVENT_CORR_COEFF('187000','184591');
+
+
+execute p_event_correlation_init();
