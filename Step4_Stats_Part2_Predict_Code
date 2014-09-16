@@ -1,0 +1,86 @@
+DECLARE
+    aSumSamples		NUMBER;
+    aMean   		NUMBER;
+    aSampleSize  	NUMBER;
+    aCount          NUMBER;
+    aCurV   		NUMBER;
+    aSqr            NUMBER;
+    aSumSqr         NUMBER:=0;
+    aPer            NUMBER(4,2);
+    aVariance		NUMBER;
+    aStdDev		    NUMBER;
+    aDate           varchar2(100);
+
+CURSOR aCur IS  
+select to_char(TO_TIMESTAMP(EVENT_TIME,'YYYY-MM-DD HH24:MI:SS.FF'),'YYYYMMDDHH24') as event_time_hour ,sum(decode( a.event_definition_id,'975780',1,0)) as cnt
+from event_logger A ,eventdefination_tech B  where a.event_definition_id=b.event_definition_id and b.active='1' 
+group by to_char(TO_TIMESTAMP(EVENT_TIME,'YYYY-MM-DD HH24:MI:SS.FF'),'YYYYMMDDHH24');  
+BEGIN
+
+    -- To get the mean, first get the sample size.
+   select count(cnt)
+   into aSampleSize
+   from (select cnt from (
+select distinct to_char(TO_TIMESTAMP(EVENT_TIME,'YYYY-MM-DD HH24:MI:SS.FF'),'YYYYMMDDHH24') as cnt
+from event_logger A ,eventdefination_tech B  where a.event_definition_id=b.event_definition_id and b.active='1' 
+group by to_char(TO_TIMESTAMP(EVENT_TIME,'YYYY-MM-DD HH24:MI:SS.FF'),'YYYYMMDDHH24')));
+    DBMS_OUTPUT.PUT_LINE('Sample Size = ' || aSampleSize);  
+    
+    -- Next get the sum of each sample
+    select sum(cnt) into aSumSamples from (
+select a.event_definition_id, to_char(TO_TIMESTAMP(EVENT_TIME,'YYYY-MM-DD HH24:MI:SS.FF'),'YYYYMMDDHH24') as event_time_hour ,count(*) as cnt
+from event_logger A ,eventdefination_tech B  where a.event_definition_id=b.event_definition_id and b.active='1' 
+group by a.event_definition_id,to_char(TO_TIMESTAMP(EVENT_TIME,'YYYY-MM-DD HH24:MI:SS.FF'),'YYYYMMDDHH24')) where event_definition_id='975780';
+    DBMS_OUTPUT.PUT_LINE('Sum Samples= ' || aSumSamples);
+    
+    -- The mean is the sum or the samples divided by the sample size
+    aMean := aSumSamples/aSampleSize;
+    DBMS_OUTPUT.PUT_LINE('Mean = ' || aMean);  
+    
+    -- Obtain each sample and determine its distance from the mean. Square it, then sum it. 
+    -- Finally divide it by the population. This is our VARIANCE....
+    OPEN aCur;
+    LOOP
+        FETCH aCur INTO aDate, aCurV;
+        EXIT WHEN aCur%NOTFOUND;        
+        aSqr := (aCurV - aMean) * (aCurV - aMean);
+        aSumSqr := aSqr + aSumSqr;    
+    END LOOP;
+    CLOSE aCur;
+
+    aVariance := aSumSqr/aSampleSize;
+    DBMS_OUTPUT.PUT_LINE('Variance = ' || aVariance);  
+
+    -- The standard deviation is the square root of our variance
+    aStdDev := SQRT(aVariance);
+    DBMS_OUTPUT.PUT_LINE('STD Deviation = ' || aStdDev);  
+  
+    -- How many samples are within one standard deviation?
+   select count(cnt) into aCount from (select to_char(TO_TIMESTAMP(EVENT_TIME,'YYYY-MM-DD HH24:MI:SS.FF'),'YYYYMMDDHH24') as event_time_hour ,sum(decode( a.event_definition_id,'975780',1,0)) as cnt
+from event_logger A ,eventdefination_tech B  where a.event_definition_id=b.event_definition_id and b.active='1' 
+group by to_char(TO_TIMESTAMP(EVENT_TIME,'YYYY-MM-DD HH24:MI:SS.FF'),'YYYYMMDDHH24'))
+  where      cnt <=  aMean + aStdDev AND
+                cnt >=  aMean - aStdDev;
+    aPer := aCount/aSampleSize;
+    DBMS_OUTPUT.PUT_LINE(aCount || ' Samples are within one Std Dev of the Mean ' || aPer || '%');
+    
+    -- How many samples are within two standard deviations?
+    select count(cnt) into aCount from (select to_char(TO_TIMESTAMP(EVENT_TIME,'YYYY-MM-DD HH24:MI:SS.FF'),'YYYYMMDDHH24') as event_time_hour ,sum(decode( a.event_definition_id,'975780',1,0)) as cnt
+from event_logger A ,eventdefination_tech B  where a.event_definition_id=b.event_definition_id and b.active='1' 
+group by to_char(TO_TIMESTAMP(EVENT_TIME,'YYYY-MM-DD HH24:MI:SS.FF'),'YYYYMMDDHH24'))
+  where      cnt <=  aMean + aStdDev+aStdDev AND
+                cnt >=  aMean - aStdDev-aStdDev;
+    aPer := aCount/aSampleSize;
+    DBMS_OUTPUT.PUT_LINE(aCount || ' Samples are within two Std Dev of the Mean ' || aPer || '%');
+    
+     -- How many samples are within three standard deviations?
+    select count(cnt) into aCount from (select to_char(TO_TIMESTAMP(EVENT_TIME,'YYYY-MM-DD HH24:MI:SS.FF'),'YYYYMMDDHH24') as event_time_hour ,sum(decode( a.event_definition_id,'975780',1,0)) as cnt
+from event_logger A ,eventdefination_tech B  where a.event_definition_id=b.event_definition_id and b.active='1' 
+group by to_char(TO_TIMESTAMP(EVENT_TIME,'YYYY-MM-DD HH24:MI:SS.FF'),'YYYYMMDDHH24'))
+   where      cnt <=  aMean + aStdDev+aStdDev+aStdDev AND
+                cnt >=  aMean - aStdDev-aStdDev-aStdDev;
+    aPer := aCount/aSampleSize;
+    DBMS_OUTPUT.PUT_LINE(aCount || ' Samples are within three Std Dev of the Mean ' || aPer || '%');
+  
+END;
+/
