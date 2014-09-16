@@ -1,0 +1,42 @@
+# Create Table Script
+
+create table event_cor(
+event_time timestamp,
+from_event_id number,
+to_event_id number,
+distance number);
+
+# Find the Time distance between event timestamp
+
+DECLARE
+EventTime TIMESTAMP;
+EventTime2 TIMESTAMP;
+total_secs number;
+cnt number := 0;
+diff interval day(9) to second(6);
+CURSOR currEvent IS
+    SELECT TO_TIMESTAMP(EVENT_TIME,'YYYY-MM-DD HH24:MI:SS.FF') EVENT_TIME FROM event_logger WHERE EVENT_DEFINITION_ID = $1;
+ 
+BEGIN
+OPEN currEvent;
+  LOOP
+    FETCH currEvent into EventTime;
+    EXIT WHEN currEvent%NOTFOUND;
+    
+    SELECT max(TO_TIMESTAMP(EVENT_TIME,'YYYY-MM-DD HH24:MI:SS.FF')) into EventTime2 FROM event_logger 
+      WHERE TO_TIMESTAMP(EVENT_TIME,'YYYY-MM-DD HH24:MI:SS.FF') < EventTime AND EVENT_DEFINITION_ID = $2 group by 1,2;
+    
+    diff := EventTime - EventTime2;
+    total_secs := abs(extract(second from diff) + extract(minute from diff)*60 + extract(hour from diff)*60*60 + extract(day from diff)*24*60*60);
+    insert into event_cor values(EventTime,$1, $2, total_secs);
+    if cnt = 1000 then
+      commit;
+      cnt := 0;
+    end if;
+    cnt := cnt + 1;
+  END LOOP;
+  commit;
+END;
+
+
+select * from event_cor;
