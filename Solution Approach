@@ -13,6 +13,19 @@ sqlldr userid=erm/********@QEDW1.akamai.com control=event_logger_1.ctl log=event
 
 Step 2 : Oberservational Data Analysis
 
+Goal : Visualize the system , subsytem  , Events triggered for given customer to take quick action on the 
+incidents raised by customer .
+
+Approach : 
+
+-- Classify each event as Metadata change ( Manual , System)  , System Generated (Limited time , Not in Scope)
+-- An
+
+Visualization : 
+
+Tool Used : Oracle Business Intelligence Enterprise Edition (OBIEE) ( So Called 'ABI' in Akamai)
+
+
 
 
 
@@ -70,9 +83,9 @@ Code      : Refer the attached excel document < >
 
 Extensibility : 
 
-
-
-
+-- Extend the analysis to find the relation between the events and incidents raised by the customer using statistical modesl
+-- Clustering of events for better analsis
+-- Management reports - Measure how efficient akamai system designs , High Frequency events
 
 
 Conclusion : 
