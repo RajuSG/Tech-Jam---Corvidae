@@ -19,19 +19,14 @@ incidents raised by customer .
 Approach : 
 
 -- Classify each event as Metadata change ( Manual , System)  , System Generated (Limited time , Not in Scope)
--- An
+-- Data prepared using SQL and loaded data into csv and box plot , 
+mosaic plotted to analyze the log scope impact on the customrer using R
 
 Visualization : 
 
 Tool Used : Oracle Business Intelligence Enterprise Edition (OBIEE) ( So Called 'ABI' in Akamai)
 
-Refer to the link : 
-
-
-
-
-
-
+Refer to the link : http://dev-abi-app02.kendall.corp.akamai.com:7001/analytics/saw.dll?Dashboard&PortalPath=%2Fshared%2FTest%2F_portal%2FEVENT&page=page%201
 
 Step 3 : Statistical Analysis Part 1 : Finding Co-relation between events 
  
@@ -43,18 +38,18 @@ Approach :
  - For given day , Calculate the no. of occurence of EEvent with respective to REvent and loaded the data into table 'events_correlation_coeff'
 
 Tool Used: SQL Developer 
-Code     : Plsql , refer the document <>
+Code     : Plsql , refer the document <Step3_Stats_Part1_Code>
 
 Verification : Using Online Corelaton Coefficient Calculotor 
 Link         : http://www.socscistatistics.com/tests/pearson/Default2.aspx
 
 
-Visualization 1 : Using Martix chart represent co-relation coefficient(r) between events
+<<<<<<<Visualization 1 : Using Martix chart represent co-relation coefficient(r) between events
 
 
 Tool Used : R Studio
 Code      :
-
+>>>>>>>>>>
 
 Visualization 2 : Using Martix chart represent co-relation coefficient(r) between events
 
@@ -89,8 +84,6 @@ Extensibility :
 -- Clustering of events for better analysis
 -- Management reports - Measure how efficient akamai system designs , High Frequency events happened
 
-
-Conclusion : 
 
 
 
