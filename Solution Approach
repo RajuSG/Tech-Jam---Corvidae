@@ -64,30 +64,30 @@ Code      : Attached visualization
 PN : Data will be restricted certain events for given small set of related systems and subsystems
 
 
-Step 4 : Statistical Analysis  Part 2 : Finding the Average time distance for the occurence of Responsive Event 
+Step 4 : Statistical Analysis  Part 2 : Finding the Average time intervals for the occurence of Responsive Event 
 for given Explanatory Event
 
 Approach : 
   - Find the list of events having positive co-relation coefficient from Step 3
-  - Find the distance (Time difference between the Responsive Event and Explanatory Event)
-  - Bucket the distance into appropriate bucket intervals
-  - Plot the Bucket Versus Time distance
+  - Find the Interval (Time interval between the Responsive Event and Explanatory Event)
+  - Bucket the intervals into appropriate bucket intervals
+  - Plot the Bucket Versus Time intervals
 
 Tool Used: SQL Developer 
-Code     : Plsql , refer the document <>
+Code     : Plsql , refer the document <Step4_Stats_Part2_Code>
 
 
-Visualization : Using  represent co-relation coefficient(r) between events
+Visualization : Represent co-relation coefficient(r) between events
 
 Tool Used : Excel
-Code      : Refer the attached excel document < > 
+Code      : Refer the attached excel document <Step4_Stats_Part2_Graph1.xlsx > 
 
 
 Extensibility : 
 
 -- Extend the analysis to find the relation between the events and incidents raised by the customer using statistical modesl
--- Clustering of events for better analsis
--- Management reports - Measure how efficient akamai system designs , High Frequency events
+-- Clustering of events for better analysis
+-- Management reports - Measure how efficient akamai system designs , High Frequency events happened
 
 
 Conclusion : 
